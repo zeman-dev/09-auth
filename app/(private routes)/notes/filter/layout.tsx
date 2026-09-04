@@ -1,4 +1,4 @@
-import css from "@/app/notes/filter/SidebarNotes.module.css";
+import css from "@/app/(private routes)/notes/filter/SidebarNotes.module.css";
 
 export default function SidebarLayout({
   children,

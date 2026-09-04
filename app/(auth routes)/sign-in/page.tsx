@@ -1,22 +1,29 @@
 'use client'
-import css from '@/(auth routes)/sign-in/sign-in.module.css';
-import { useRouter } from 'next/router';
+import css from '@/app/(auth routes)/sign-in/sign-in.module.css';
+import { login } from '@/lib/api/clientApi';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function signIn(){
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState();
+
+ const router = useRouter();
+const [error, setError] = useState('');
 
   async function handlesubmit(formData: FormData){
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
- }
+  try {
+    await login({email, password});
+    router.push('/notes/filter/all');
+  }catch(error){
+    setError(error as string)
+  }
 
- const router = useRouter();
+ }
 
     return(
         <><main className={css.mainContent}>
- <form className={css.form}>
+ <form className={css.form} action={handlesubmit}>
     <h1 className={css.formTitle}>Sign in</h1>
 
     <div className={css.formGroup}>
@@ -30,7 +37,7 @@ export default function signIn(){
     </div>
 
     <div className={css.actions}>
-      <button type="submit" className={css.submitButton} onClick={() => handlesubmit}>
+      <button type="submit" className={css.submitButton}>
         Log in
       </button>
     </div>

@@ -1,4 +1,4 @@
-import css from '@/app/notes/filter/@sidebar/sidebar.module.css';
+import css from '@/app/(private routes)/notes/filter/@sidebar/sidebar.module.css';
 import Link from 'next/link';
 
 export default function Sidebar() {
