@@ -13,9 +13,9 @@ export default function signUp() {
     const password = formData.get('password') as string;
     try {
       await register({email, password});
-      router.push('/notes/filter/all');
+      router.push('/profile');
     }catch(error){
-      setError(error as string)
+      setError(error as string);
     }
   
    }

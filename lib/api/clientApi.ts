@@ -1,4 +1,5 @@
 import { Note } from '@/types/note';
+import type { registerRequest, User } from '@/types/user';
 import axios from 'axios';
 
 const nextServer = axios.create({baseURL: process.env.NEXT_PUBLIC_API_URL + '/api'});
@@ -66,16 +67,7 @@ export async function fetchNoteById(taskId: string): Promise<Note>{
 //   return data;
 // }
 
-type User = {
- email: string,
- password: string,
- avatar?: string,
-} 
 
-interface registerRequest {
-  email: string,
-  password: string,
-}
 
 export async function register(data: registerRequest) {
   const response = await nextServer.post<User>('/auth/register', data);
@@ -85,4 +77,8 @@ export async function register(data: registerRequest) {
 export async function login(user : registerRequest){
  const response = await nextServer.post<User>('/auth/login', user);
  return response.data;
+}
+
+export async function getMe(){
+
 }
