@@ -4,6 +4,8 @@ import './globals.css';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
+import AuthNavigation from '@/components/AuthNavigation/AuthNavigation';
+import AuthProvider from '@/components/AuthProvider/AuthProvider';
 
 export const metadata: Metadata = {
   title: 'NoteHub',
@@ -57,10 +59,12 @@ export default function RootLayout({
     >
       <body className={`${geistRoboto.variable}`}>
         <TanStackProvider>
+          <AuthProvider>
           <Header />
           {modal}
           {children}
           <Footer />
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>

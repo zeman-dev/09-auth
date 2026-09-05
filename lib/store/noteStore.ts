@@ -1,6 +1,6 @@
 'use client'
 import { create } from 'zustand';
-import { CreatedNote } from '../api';
+import { CreatedNote } from '@/lib/api/clientApi';
 import { persist } from 'zustand/middleware';
 
 

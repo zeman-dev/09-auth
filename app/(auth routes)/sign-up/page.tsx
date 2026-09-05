@@ -1,21 +1,25 @@
 "use client"
 import css from '@/app/(auth routes)/sign-up/sign-up.module.css';
+import { ApiError } from '@/app/api/api';
 import { register } from '@/lib/api/clientApi';
+import { useAuthUser } from '@/users/user';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function signUp() {
    const router = useRouter();
   const [error, setError] = useState('');
+  const setUser = useAuthUser(state => state.setUser);
   
     async function handlesubmit(formData: FormData){
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     try {
-      await register({email, password});
+      const user = await register({email, password});
+      setUser(user);
       router.push('/profile');
     }catch(error){
-      setError(error as string);
+      setError((error as ApiError).response?.data.error ?? (error as ApiError).message);
     }
   
    }
@@ -52,8 +56,7 @@ export default function signUp() {
               Register
             </button>
           </div>
-
-          {error && <p className={css.error}>Error</p>}
+          {error && <p className={css.error}>{error}</p>}
         </form>
       </main>
     </>

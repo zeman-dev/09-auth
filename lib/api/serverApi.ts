@@ -1,7 +1,11 @@
-import axios from "axios";
 import { FetchNotesResponse } from "./clientApi";
 import { Note } from "@/types/note";
 import { api } from "@/app/api/api";
+import { User } from "@/types/user";
+import { cookies } from "next/headers";
+import { isAxiosError } from "axios";
+import { logErrorResponse } from "@/app/api/_utils/utils";
+import { NextResponse } from "next/server";
 
 
  export async function FetchNotes(
@@ -40,10 +44,24 @@ export async function fetchNoteById(taskId: string): Promise<Note>{
   return response.data;
 }
 
-export async function getMe (){
-    const response = await api.get(``,
-        {
-            headers:{}
-        }
-    )
+export async function getMe(){
+   const cookieStore = await cookies();
+  try {
+      const cookieStore = await cookies();
+  
+      const res = await api.get('/users/me', {
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+      });
+      return res.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        logErrorResponse(error.response?.data);
+        return NextResponse.json(
+          { error: error.message, response: error.response?.data },
+          { status: error.status }
+        );
+      }
+    }
 }

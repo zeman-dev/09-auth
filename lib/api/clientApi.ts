@@ -2,6 +2,7 @@ import { Note } from '@/types/note';
 import type { registerRequest, User } from '@/types/user';
 import axios from 'axios';
 
+
 const nextServer = axios.create({baseURL: process.env.NEXT_PUBLIC_API_URL + '/api'});
 
 
@@ -79,6 +80,20 @@ export async function login(user : registerRequest){
  return response.data;
 }
 
-export async function getMe(){
+export async function logout(){
+ await nextServer.post<User>('/auth/logout');
+}
 
+ type CheckSessionResponse ={
+  succsess: boolean;
+ }
+
+export async function checkSession(){
+  const response = await nextServer.get<CheckSessionResponse>('/auth/session');
+  return response.data.succsess;
+}
+
+export async function getMe(){
+  const response = await nextServer.get<User>("/users/me");
+  return response.data;
 }

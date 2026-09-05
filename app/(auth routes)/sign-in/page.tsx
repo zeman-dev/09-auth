@@ -1,49 +1,67 @@
-'use client'
+'use client';
 import css from '@/app/(auth routes)/sign-in/sign-in.module.css';
+import { ApiError } from '@/app/api/api';
 import { login } from '@/lib/api/clientApi';
+import { useAuthUser } from '@/users/user';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function signIn(){
 
- const router = useRouter();
-const [error, setError] = useState('');
 
-  async function handlesubmit(formData: FormData){
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-  try {
-    await login({email, password});
-    router.push('/notes/filter/all');
-  }catch(error){
-    setError(error as string)
-  }
+export default function signIn() {
 
- }
+const [isError, setIsError] = useState("");
+const setUser = useAuthUser(state => state.setUser);
+const router = useRouter();
 
-    return(
-        <><main className={css.mainContent}>
- <form className={css.form} action={handlesubmit}>
-    <h1 className={css.formTitle}>Sign in</h1>
+  async function handlesubmit(formData: FormData) {
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    try {
+      const user = await login({ email: email, password });
+      setUser(user);
+      router.push('/notes/filter/all');
+    }catch(error){
+          setIsError((error as ApiError).response?.data.error ?? (error as ApiError).message);
+        }
+    }
 
-    <div className={css.formGroup}>
-      <label htmlFor="email">Email</label>
-      <input id="email" type="email" name="email" className={css.input} required />
-    </div>
+  return (
+    <>
+      <main className={css.mainContent}>
+        <form className={css.form} action={handlesubmit}>
+          <h1 className={css.formTitle}>Sign in</h1>
 
-    <div className={css.formGroup}>
-      <label htmlFor="password">Password</label>
-      <input id="password" type="password" name="password" className={css.input} required />
-    </div>
+          <div className={css.formGroup}>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              className={css.input}
+              required
+            />
+          </div>
 
-    <div className={css.actions}>
-      <button type="submit" className={css.submitButton}>
-        Log in
-      </button>
-    </div>
-        {error && <p className={css.error}>{error}</p>}
-  </form>
-</main>
-</>
-    )
+          <div className={css.formGroup}>
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              className={css.input}
+              required
+            />
+          </div>
+
+          <div className={css.actions}>
+            <button type="submit" className={css.submitButton}>
+              Log in
+            </button>
+          </div>
+          {isError && <p className={css.error}>{isError}</p>}
+        </form>
+      </main>
+    </>
+  );
 }

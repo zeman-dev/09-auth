@@ -1,8 +1,11 @@
 import css from "@/app/(private routes)/profile/ProfilePage.module.css";
+import { getMe } from "@/lib/api/serverApi";
+import Image from "next/image";
 import Link from "next/link";
 
 
-export default function ProfilePage(){
+export default async function ProfilePage(){
+  const user = await getMe();
     return(
         <main className={css.mainContent}>
   <div className={css.profileCard}>
@@ -12,21 +15,22 @@ export default function ProfilePage(){
 	       Edit Profile
 	     </Link>
 	   </div>
-     <div className={css.avatarWrapper}>
-      <img
-        src="user_avatar"
+     {user.avatar && <div className={css.avatarWrapper}>
+      <Image
+        loading="eager"
+        src={user.avatar}
         alt="User Avatar"
         width={120}
         height={120}
         className={css.avatar}
       />
-    </div>
+    </div>}
     <div className={css.profileInfo}>
       <p>
-        Username: user_username
+        Username: {user.username}
       </p>
       <p>
-        Email: user_email
+        Email: {user.username}
       </p>
     </div>
   </div>
