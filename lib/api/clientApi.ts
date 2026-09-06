@@ -61,15 +61,6 @@ export async function fetchNoteById(taskId: string): Promise<Note>{
   return response.data;
 }
 
-// export async function getNoteById(noteId:string):Promise<Note> {
-//   const response = await fetch(`https://notehub-public.goit.study/api/notes/${noteId}`);
-//   if(!response.ok)throw new Error("Failed to fetch poost");
-//   const data = (await response.json()) as Note;
-//   return data;
-// }
-
-
-
 export async function register(data: registerRequest) {
   const response = await nextServer.post<User>('/auth/register', data);
   return response.data;
