@@ -84,12 +84,9 @@ export async function logout(){
  await nextServer.post<User>('/auth/logout');
 }
 
- type CheckSessionResponse ={
-  succsess: boolean;
- }
 
 export async function checkSession(){
-  const response = await nextServer.get<CheckSessionResponse>('/auth/session');
+  const response = await nextServer.get('/auth/session');
   return response.data.succsess;
 }
 
