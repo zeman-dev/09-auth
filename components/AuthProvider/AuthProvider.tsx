@@ -1,7 +1,7 @@
 'use client';
 
 import { checkSession, getMe } from '@/lib/api/clientApi';
-import { useAuthUser } from '@/users/user';
+import { useAuthUser } from '@/lib/store/authStore';
 import { useEffect } from 'react';
 
 type AuthProviderProps = {
