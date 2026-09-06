@@ -1,7 +1,7 @@
 import { User } from '@/types/user';
 import type { FetchNotesResponse } from './clientApi';
 import { Note } from '@/types/note';
-import { api } from '@/app/api/api';
+import { api } from '@/lib/api/api';
 import { cookies } from 'next/headers';
 import { isAxiosError } from 'axios';
 import { logErrorResponse } from '@/app/api/_utils/utils';
@@ -24,7 +24,7 @@ export async function FetchNotes(
       tag,
     },
     headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
+       Cookie: cookieStore.toString(),
     },
   });
   return response.data;
@@ -33,7 +33,7 @@ export async function FetchNotes(
 export async function fetchNoteById(taskId: string): Promise<Note> {
   const response = await api.get<Note>(`/notes/${taskId}`, {
     headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
+       Cookie: cookieStore.toString(),
     },
   });
   return response.data;
