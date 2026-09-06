@@ -2,7 +2,7 @@
 import css from '@/app/(auth routes)/sign-in/sign-in.module.css';
 import { ApiError } from '@/app/api/api';
 import { login } from '@/lib/api/clientApi';
-import { useAuthUser } from '@/users/user';
+import { useAuthUser } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
