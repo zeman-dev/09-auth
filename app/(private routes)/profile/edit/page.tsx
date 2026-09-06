@@ -1,9 +1,18 @@
+'use client'
 import css from '@/app/(private routes)/profile/edit/EditProfilePage.module.css';
-import { getMe } from '@/lib/api/serverApi';
+import { getMe } from '@/lib/api/clientApi';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default async function EditProfilePage() {
+
+  const router = useRouter();
+
   const user = await getMe();
+
+  function handleCancel(){
+    router.back();
+  }
   return (
     <>
       <main className={css.mainContent}>
@@ -31,7 +40,7 @@ export default async function EditProfilePage() {
               <button type="submit" className={css.saveButton}>
                 Save
               </button>
-              <button type="button" className={css.cancelButton}>
+              <button type="submit" className={css.cancelButton} onClick={handleCancel}>
                 Cancel
               </button>
             </div>

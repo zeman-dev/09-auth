@@ -1,6 +1,8 @@
 import { cookies, headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkSession } from './lib/api/serverApi';
+import { parseCookie } from 'cookie';
+import { api } from './app/api/api';
 
 const privateRoutes = ['/profile', '/notes'];
 const publicRoutes = ['/sign-in', '/sign-up'];
@@ -19,7 +21,35 @@ export async function proxy(req: NextRequest) {
 
   if (accessToken === undefined) {
     if (refreshToken !== undefined) {
-      const { headers } = await checkSession();
+const { headers } = await api.get("/auth/session", {
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+      });
+
+      const setCookie = headers["set-cookie"];
+
+      if (setCookie !== undefined) {
+        const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
+
+        for (const cookieString of cookieArray) {
+          const parsed = parseCookie(cookieString);
+
+          const options = {
+            expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
+            path: parsed.Path,
+            maxAge: Number(parsed["Max-Age"]),
+          };
+
+          if (parsed.accessToken !== undefined) {
+            cookieStore.set("accessToken", parsed.accessToken, options);
+          }
+
+          if (parsed.refreshToken !== undefined) {
+            cookieStore.set("refreshToken", parsed.refreshToken, options);
+          }
+        }
+      }
       if (isPublicRoutes) {
         return NextResponse.redirect(new URL('/profile', req.url), {
           headers: {
@@ -43,8 +73,11 @@ export async function proxy(req: NextRequest) {
     }
   }
   else{
+    if(isPrivateRoutes){
+        return NextResponse.next();
+    }
     if(isPublicRoutes){
-        return NextResponse.redirect(new URL("/profile", req.url))
+        return NextResponse.redirect(new URL("/", req.url));
     }
   }
 }

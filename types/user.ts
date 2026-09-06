@@ -4,7 +4,7 @@ export type User = {
  avatar: string,
 } 
 
-export interface registerRequest {
+export interface RegisterRequest {
   email: string,
   password: string,
 }

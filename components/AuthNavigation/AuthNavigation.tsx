@@ -1,11 +1,11 @@
 'use client';
 import css from '@/components/AuthNavigation/AuthNavigation.module.css';
-import { logout } from '@/lib/api/clientApi';
+import { getMe, logout } from '@/lib/api/clientApi';
 import { useAuthUser } from '@/lib/store/authStore';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function AuthNavigation() {
+export default async function AuthNavigation() {
   const isAuth = useAuthUser(state => state.isAuthenticated);
   const removeUser = useAuthUser(state => state.clearIsAuthenticated);
   const router = useRouter();
@@ -19,6 +19,8 @@ export default function AuthNavigation() {
       console.log(error);
     }
   }
+
+  const user = await getMe();
 
   return (
     <>
@@ -35,7 +37,7 @@ export default function AuthNavigation() {
             </Link>
           </li>
           <li className={css.navigationItem}>
-            <p className={css.userEmail}>User email</p>
+            <p className={css.userEmail}>{user?.email}</p>
             <button className={css.logoutButton} onClick={hanldeLogout}>
               Logout
             </button>

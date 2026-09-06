@@ -10,7 +10,7 @@ type AuthProviderProps = {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const setUser = useAuthUser(state => state.setUser);
-  const clearUser = useAuthUser(state => state.clearIsAuthenticated);
+  const clearIsAuthenticated = useAuthUser(state => state.clearIsAuthenticated);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -19,11 +19,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         const user = await getMe();
         setUser(user);
       } else {
-        clearUser();
+        clearIsAuthenticated();
       }
     }
-    fetchUsers
+    fetchUsers();
   }, []);
 
-  return children;
+  return <>{children}</> ;
 }

@@ -20,7 +20,7 @@ const router = useRouter();
     try {
       const user = await login({ email: email, password });
       setUser(user);
-      router.push('/notes/filter/all');
+      router.push('/profile');
     }catch(error){
           setIsError((error as ApiError).response?.data.error ?? (error as ApiError).message);
         }

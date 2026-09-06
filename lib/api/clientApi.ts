@@ -1,16 +1,16 @@
 import { Note } from '@/types/note';
-import type { registerRequest, User } from '@/types/user';
+import type { RegisterRequest, User } from '@/types/user';
 import axios from 'axios';
 
 
-const nextServer = axios.create({baseURL: process.env.NEXT_PUBLIC_API_URL + '/api'});
+const nextServer = axios.create({baseURL: process.env.NEXT_PUBLIC_PROXY_URL + '/api'});
 
 
 export interface FetchNotesResponse {
   notes: Note[];
   totalPages: number;
 }
-export async function FetchNotes(
+export async function fetchNotes(
   query: string = '',
   currentPage: number,
   tag?: string,
@@ -56,29 +56,29 @@ export async function deleteNote(taskId: string):Promise<Note> {
 
 export async function fetchNoteById(taskId: string): Promise<Note>{
   const response = await nextServer.get<Note>(
-    `/api/notes/${taskId}`,
+    `/notes/${taskId}`,
   );
   return response.data;
 }
 
-export async function register(data: registerRequest) {
+export async function register(data: RegisterRequest) {
   const response = await nextServer.post<User>('/auth/register', data);
   return response.data;
 }
 
-export async function login(user : registerRequest){
+export async function login(user : RegisterRequest){
  const response = await nextServer.post<User>('/auth/login', user);
  return response.data;
 }
 
 export async function logout(){
- await nextServer.post<User>('/auth/logout');
+ await nextServer.post('/auth/logout');
 }
 
 
 export async function checkSession(){
   const response = await nextServer.get('/auth/session');
-  return response.data.succsess;
+  return response.data.success;
 }
 
 export async function getMe(){

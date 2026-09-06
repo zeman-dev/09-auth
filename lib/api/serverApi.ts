@@ -13,6 +13,7 @@ export async function FetchNotes(
   currentPage: number,
   tag?: string
 ): Promise<FetchNotesResponse> {
+  const cookieStore = await cookies();
   if (tag === 'all' || tag === 'All') {
     tag = undefined;
   }
@@ -30,8 +31,9 @@ export async function FetchNotes(
   return response.data;
 }
 
-export async function fetchNoteById(taskId: string): Promise<Note> {
-  const response = await api.get<Note>(`/notes/${taskId}`, {
+export async function fetchNoteById(Id: string): Promise<Note> {
+  const cookieStore = await cookies();
+  const response = await api.get<Note>(`/notes/${Id}`, {
     headers: {
        Cookie: cookieStore.toString(),
     },
@@ -39,7 +41,7 @@ export async function fetchNoteById(taskId: string): Promise<Note> {
   return response.data;
 }
 
-export async function getMe() {
+export async function getMe():Promise<User | null> {
   try {
     const cookieStore = await cookies();
 
@@ -58,43 +60,46 @@ export async function getMe() {
 }
 
 export async function checkSession() {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+  const refreshToken = cookieStore.get('refreshToken')?.value;
+
+  if (accessToken) {
+    // якщо accessToken вже валідний, все одно варто повернути
+    // узгоджений тип — або реальний виклик /auth/session, або
+    // явно задокументований "короткий шлях" без Axios-відповіді
+    return null; // немає потреби йти в бекенд — обробіть цей case окремо в handler'і
+  }
+
+  if (!refreshToken) {
+    return null;
+  }
+
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('accessToken')?.value;
-    const refreshToken = cookieStore.get('refreshToken')?.value;
+    const apiRes = await api.get('auth/session', {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
 
-    if (accessToken) {
-      return NextResponse.json({ success: true });
-    }
-
-    if (refreshToken) {
-      const apiRes = await api.get('auth/session', {
-        headers: {
-          Cookie: cookieStore.toString(),
-        },
-      });
-
-      const setCookie = apiRes.headers['set-cookie'];
-
-      if (setCookie) {
-        const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
-        for (const cookieStr of cookieArray) {
-          const parsed = parseSetCookie(cookieStr);
-
-          if (parsed.value) {
-            cookieStore.set(parsed.name, parsed.value, parsed);
-          }
+    const setCookie = apiRes.headers['set-cookie'];
+    if (setCookie) {
+      const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
+      for (const cookieStr of cookieArray) {
+        const parsed = parseSetCookie(cookieStr);
+        if (parsed.value) {
+          cookieStore.set(parsed.name, parsed.value, parsed);
         }
-        return NextResponse.json({ success: true }, { status: 200 });
       }
     }
-    return NextResponse.json({ success: false }, { status: 200 });
+
+    return apiRes; // <-- повний Axios response, без обгортки NextResponse
   } catch (error) {
     if (isAxiosError(error)) {
       logErrorResponse(error.response?.data);
-      return NextResponse.json({ success: false }, { status: 200 });
+    } else {
+      logErrorResponse({ message: (error as Error).message });
     }
-    logErrorResponse({ message: (error as Error).message });
-    return NextResponse.json({ success: false }, { status: 200 });
+    throw error; // або: return error.response, якщо хочете обробляти без throw
   }
 }
