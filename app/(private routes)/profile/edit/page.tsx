@@ -10,14 +10,14 @@ export default async function EditProfilePage() {
         <div className={css.profileCard}>
           <h1 className={css.formTitle}>Edit Profile</h1>
 
-          <Image
+         {user?.avatar && <Image
             loading="eager"
-            src={user.avatar}
+            src={user?.avatar}
             alt="User Avatar"
             width={120}
             height={120}
             className={css.avatar}
-          />
+          />}
 
           <form className={css.profileInfo}>
             <div className={css.usernameWrapper}>
@@ -25,7 +25,7 @@ export default async function EditProfilePage() {
               <input id="username" type="text" className={css.input} />
             </div>
 
-            <p>Email: {user.username}</p>
+            <p>Email: {user?.email}</p>
 
             <div className={css.actions}>
               <button type="submit" className={css.saveButton}>

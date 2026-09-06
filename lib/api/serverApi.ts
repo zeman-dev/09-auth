@@ -1,72 +1,64 @@
-import type { FetchNotesResponse } from "./clientApi";
-import { Note } from "@/types/note";
-import { api } from "@/app/api/api";
-import { cookies } from "next/headers";
-import { isAxiosError } from "axios";
-import { logErrorResponse } from "@/app/api/_utils/utils";
-import { NextResponse } from "next/server";
-import { parseSetCookie } from "cookie";
+import { User } from '@/types/user';
+import type { FetchNotesResponse } from './clientApi';
+import { Note } from '@/types/note';
+import { api } from '@/app/api/api';
+import { cookies } from 'next/headers';
+import { isAxiosError } from 'axios';
+import { logErrorResponse } from '@/app/api/_utils/utils';
+import { NextResponse } from 'next/server';
+import { parseSetCookie } from 'cookie';
 
-
- export async function FetchNotes(
+export async function FetchNotes(
   query: string = '',
   currentPage: number,
-  tag?: string,
+  tag?: string
 ): Promise<FetchNotesResponse> {
-  if(tag === 'all' || tag === 'All'){
+  if (tag === 'all' || tag === 'All') {
     tag = undefined;
   }
-  const response = await api.get<FetchNotesResponse>(
-    '/notes',
-    {
-      params: {
-        search: query,
-        page: currentPage,
-        perPage: 12,
-        tag,
-      },
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      },
-    }
-  );
+  const response = await api.get<FetchNotesResponse>('/notes', {
+    params: {
+      search: query,
+      page: currentPage,
+      perPage: 12,
+      tag,
+    },
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
+    },
+  });
   return response.data;
 }
 
-export async function fetchNoteById(taskId: string): Promise<Note>{
-  const response = await api.get<Note>(
-    `/notes/${taskId}`,
-        {headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      },
-    }
-  );
+export async function fetchNoteById(taskId: string): Promise<Note> {
+  const response = await api.get<Note>(`/notes/${taskId}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
+    },
+  });
   return response.data;
 }
 
-export async function getMe(){
+export async function getMe() {
   try {
-      const cookieStore = await cookies();
-  
-      const res = await api.get('/users/me', {
-        headers: {
-          Cookie: cookieStore.toString(),
-        },
-      });
-      return res.data;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        logErrorResponse(error.response?.data);
-        return NextResponse.json(
-          { error: error.message, response: error.response?.data },
-          { status: error.status }
-        );
-      }
+    const cookieStore = await cookies();
+
+    const res = await api.get<User>('/users/me', {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
+    return res.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      logErrorResponse(error.response?.data);
     }
+    return null;
+  }
 }
 
-export async function checkSession(){
- try {
+export async function checkSession() {
+  try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('accessToken')?.value;
     const refreshToken = cookieStore.get('refreshToken')?.value;
