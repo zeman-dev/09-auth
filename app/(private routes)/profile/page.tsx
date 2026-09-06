@@ -15,7 +15,7 @@ export default async function ProfilePage(){
 	       Edit Profile
 	     </Link>
 	   </div>
-     {user.avatar && <div className={css.avatarWrapper}>
+     {user?.avatar && <div className={css.avatarWrapper}>
       <Image
         loading="eager"
         src={user.avatar}
@@ -27,10 +27,10 @@ export default async function ProfilePage(){
     </div>}
     <div className={css.profileInfo}>
       <p>
-        Username: {user.username}
+        Username: {user?.username}
       </p>
       <p>
-        Email: {user.username}
+        Email: {user?.username}
       </p>
     </div>
   </div>
