@@ -10,7 +10,7 @@ export default async function EditProfilePage() {
         <div className={css.profileCard}>
           <h1 className={css.formTitle}>Edit Profile</h1>
 
-         {user?.avatar && <Image
+         {user !== null && user?.avatar && <Image
             loading="eager"
             src={user?.avatar}
             alt="User Avatar"
