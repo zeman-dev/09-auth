@@ -1,5 +1,5 @@
 import css from '@/app/(private routes)/profile/edit/EditProfilePage.module.css';
-import { getMe } from '@/lib/api/clientApi';
+import { getMe } from '@/lib/api/serverApi';
 import Image from 'next/image';
 
 export default async function EditProfilePage() {
