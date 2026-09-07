@@ -1,6 +1,6 @@
 import { cookies, headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { parseCookie, parseSetCookie  } from 'cookie';
+import { parseSetCookie  } from 'cookie';
 import { checkSession } from '@/lib/api/serverApi';
 
 const privateRoutes = ['/profile', '/notes'];
@@ -34,23 +34,28 @@ export async function proxy(req: NextRequest) {
       continue;
     }
 
+    const parsedMaxAge =
+  parsed.maxAge !== undefined ? Number(parsed.maxAge) : undefined;
+
           const options = {
             expires: parsed.expires ? new Date(parsed.expires) : undefined,
             path: parsed.path,
-            maxAge: Number(parsed["maxAge"]),
+            ...(parsedMaxAge !== undefined && !Number.isNaN(parsedMaxAge)
+    ? { maxAge: parsedMaxAge }
+    : {}),
           };
 
-          if ((parsed.name === 'accessToken') !== undefined) {
+          if (parsed.name === 'accessToken') {
             cookieStore.set("accessToken", parsed.value, options);
           }
 
-          if ((parsed.name === 'refreshToken') !== undefined) {
+          if (parsed.name === 'refreshToken') {
             cookieStore.set("refreshToken", parsed.value, options);
           }
         }
       }
       if (isPublicRoutes) {
-        return NextResponse.redirect(new URL('/profile', req.url), {
+        return NextResponse.redirect(new URL('/', req.url), {
           headers: {
             Cookie: cookieStore.toString(),
           },

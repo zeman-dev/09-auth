@@ -34,7 +34,7 @@ export default function EditProfilePage() {
     setUser(updatedUser);
       setChangedUser(updatedUser);
       try {
-        await updateMe({username : changedUsername});
+        await updateMe(changedUsername);
       } catch (error) {
         console.log(error);
       }
