@@ -2,13 +2,25 @@
 import css from '@/components/AuthNavigation/AuthNavigation.module.css';
 import { getMe, logout } from '@/lib/api/clientApi';
 import { useAuthUser } from '@/lib/store/authStore';
+import { User } from '@/types/user';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-export default async function AuthNavigation() {
+export default function AuthNavigation() {
   const isAuth = useAuthUser(state => state.isAuthenticated);
   const removeUser = useAuthUser(state => state.clearIsAuthenticated);
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!isAuth) return;
+    getMe()
+      .then(setUser)
+      .catch((error) => {
+        console.error('Failed to fetch user:', error);
+      });
+  }, [isAuth]);
 
   async function hanldeLogout() {
     try {
@@ -19,8 +31,6 @@ export default async function AuthNavigation() {
       console.log(error);
     }
   }
-
-  const user = await getMe();
 
   return (
     <>

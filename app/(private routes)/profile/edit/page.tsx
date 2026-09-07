@@ -1,14 +1,28 @@
 'use client'
 import css from '@/app/(private routes)/profile/edit/EditProfilePage.module.css';
 import { getMe } from '@/lib/api/clientApi';
+import { useAuthUser } from '@/lib/store/authStore';
+import { User } from '@/types/user';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-export default async function EditProfilePage() {
+export default function EditProfilePage() {
 
+  const isAuth = useAuthUser(state => state.isAuthenticated);
   const router = useRouter();
 
-  const user = await getMe();
+const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!isAuth) return;
+    getMe()
+      .then(setUser)
+      .catch((error) => {
+        console.error('Failed to fetch user:', error);
+      });
+  }, [isAuth]);
+  
 
   function handleCancel(){
     router.back();
