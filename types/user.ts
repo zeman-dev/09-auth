@@ -8,7 +8,3 @@ export interface RegisterRequest {
   email: string,
   password: string,
 }
-
-export type UpdateUser = {
-  username: string,
-}
