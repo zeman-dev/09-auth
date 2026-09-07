@@ -1,5 +1,5 @@
 import { Note } from '@/types/note';
-import type { RegisterRequest, User } from '@/types/user';
+import type { RegisterRequest, UpdateUser, User } from '@/types/user';
 import axios from 'axios';
 
 
@@ -78,7 +78,7 @@ export async function logout(){
 
 export async function checkSession(){
   const response = await nextServer.get('/auth/session');
-  return response.data.success;
+  return response.data;
 }
 
 export async function getMe(){
@@ -86,7 +86,7 @@ export async function getMe(){
   return response.data;
 }
 
-export async function updateMe(user : User){
+export async function updateMe(user : UpdateUser){
   const response = await nextServer.patch<User>("/users/me", user);
   return response.data;
 }

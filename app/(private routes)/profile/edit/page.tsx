@@ -34,7 +34,7 @@ export default function EditProfilePage() {
     setUser(updatedUser);
       setChangedUser(updatedUser);
       try {
-        await updateMe(updatedUser);
+        await updateMe({username : changedUsername});
       } catch (error) {
         console.log(error);
       }
@@ -62,7 +62,7 @@ export default function EditProfilePage() {
           <form className={css.profileInfo} action={changeUserData}>
             <div className={css.usernameWrapper}>
               <label htmlFor="username">Username:</label>
-              <input id="username" name="username" type="text" className={css.input} />
+              <input id="username" name="username" type="text" className={css.input} defaultValue={user?.username}/>
             </div>
 
             <p>Email: {user?.email}</p>

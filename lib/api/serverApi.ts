@@ -5,7 +5,6 @@ import { api } from '@/lib/api/api';
 import { cookies } from 'next/headers';
 import { isAxiosError } from 'axios';
 import { logErrorResponse } from '@/app/api/_utils/utils';
-import { NextResponse } from 'next/server';
 import { parseSetCookie } from 'cookie';
 
 export async function FetchNotes(

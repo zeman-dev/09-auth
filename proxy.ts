@@ -1,7 +1,7 @@
 import { cookies, headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { parseCookie } from 'cookie';
-import { api } from './app/api/api';
+import { parseCookie, parseSetCookie  } from 'cookie';
+import { checkSession } from '@/lib/api/serverApi';
 
 const privateRoutes = ['/profile', '/notes'];
 const publicRoutes = ['/sign-in', '/sign-up'];
@@ -20,11 +20,7 @@ export async function proxy(req: NextRequest) {
 
   if (accessToken === undefined) {
     if (refreshToken !== undefined) {
-const { headers } = await api.get("/auth/session", {
-        headers: {
-          Cookie: cookieStore.toString(),
-        },
-      });
+    const { headers } = await checkSession();
 
       const setCookie = headers["set-cookie"];
 
@@ -32,20 +28,24 @@ const { headers } = await api.get("/auth/session", {
         const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
 
         for (const cookieString of cookieArray) {
-          const parsed = parseCookie(cookieString);
+          const parsed = parseSetCookie(cookieString);
+
+          if (parsed.value === undefined) {
+      continue;
+    }
 
           const options = {
-            expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
-            path: parsed.Path,
-            maxAge: Number(parsed["Max-Age"]),
+            expires: parsed.expires ? new Date(parsed.expires) : undefined,
+            path: parsed.path,
+            maxAge: Number(parsed["maxAge"]),
           };
 
-          if (parsed.accessToken !== undefined) {
-            cookieStore.set("accessToken", parsed.accessToken, options);
+          if ((parsed.name === 'accessToken') !== undefined) {
+            cookieStore.set("accessToken", parsed.value, options);
           }
 
-          if (parsed.refreshToken !== undefined) {
-            cookieStore.set("refreshToken", parsed.refreshToken, options);
+          if ((parsed.name === 'refreshToken') !== undefined) {
+            cookieStore.set("refreshToken", parsed.value, options);
           }
         }
       }
@@ -63,6 +63,7 @@ const { headers } = await api.get("/auth/session", {
           },
         });
       }
+      return NextResponse.next();
     }
     if(isPublicRoutes){
         return NextResponse.next();
@@ -70,6 +71,7 @@ const { headers } = await api.get("/auth/session", {
     if(isPrivateRoutes){
         return NextResponse.redirect( new URL("/sign-in", req.url));
     }
+    return NextResponse.next();
   }
   else{
     if(isPrivateRoutes){
@@ -78,6 +80,7 @@ const { headers } = await api.get("/auth/session", {
     if(isPublicRoutes){
         return NextResponse.redirect(new URL("/", req.url));
     }
+    return NextResponse.next();
   }
 }
 
