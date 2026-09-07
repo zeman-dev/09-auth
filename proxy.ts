@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { parseCookie } from "cookie";
+import { parseSetCookie } from "cookie";
 
 import { checkSession } from "./lib/api/serverApi";
 
@@ -44,32 +44,24 @@ export async function proxy(request: NextRequest) {
           : [setCookie];
 
         for (const cookieStr of cookieArray) {
-          const parsed = parseCookie(cookieStr);
+          const parsed = parseSetCookie(cookieStr);
 
-          const options = {
-            expires: parsed.Expires
-              ? new Date(parsed.Expires)
-              : undefined,
-            path: parsed.Path,
-            maxAge: parsed["Max-Age"]
-              ? Number(parsed["Max-Age"])
-              : undefined,
-          };
-
-          if (parsed.accessToken) {
-            response.cookies.set(
-              "accessToken",
-              parsed.accessToken,
-              options
-            );
+          if (!parsed.value) {
+            continue;
           }
 
-          if (parsed.refreshToken) {
-            response.cookies.set(
-              "refreshToken",
-              parsed.refreshToken,
-              options
-            );
+          const options = {
+            expires: parsed.expires,
+            path: parsed.path,
+            maxAge: parsed.maxAge,
+          };
+
+          if (parsed.name === "accessToken") {
+            response.cookies.set("accessToken", parsed.value, options);
+          }
+
+          if (parsed.name === "refreshToken") {
+            response.cookies.set("refreshToken", parsed.value, options);
           }
         }
       }
