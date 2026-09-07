@@ -85,3 +85,8 @@ export async function getMe(){
   const response = await nextServer.get<User>("/users/me");
   return response.data;
 }
+
+export async function updateMe(user : User){
+  const response = await nextServer.patch<User>("/users/me", user);
+  return response.data;
+}

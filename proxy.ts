@@ -1,6 +1,5 @@
 import { cookies, headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { checkSession } from './lib/api/serverApi';
 import { parseCookie } from 'cookie';
 import { api } from './app/api/api';
 

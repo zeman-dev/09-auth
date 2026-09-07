@@ -61,24 +61,12 @@ export async function getMe():Promise<User | null> {
 
 export async function checkSession() {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
-  const refreshToken = cookieStore.get('refreshToken')?.value;
-
-  if (accessToken) {
-    // якщо accessToken вже валідний, все одно варто повернути
-    // узгоджений тип — або реальний виклик /auth/session, або
-    // явно задокументований "короткий шлях" без Axios-відповіді
-    return null; // немає потреби йти в бекенд — обробіть цей case окремо в handler'і
-  }
-
-  if (!refreshToken) {
-    return null;
-  }
 
   try {
     const apiRes = await api.get('auth/session', {
       headers: {
-        Cookie: cookieStore.toString(),
+        Cookie: cookieStore.toString(), // передаємо всі куки як є —
+                                          // бекенд сам вирішить, який токен валідний
       },
     });
 
@@ -93,13 +81,16 @@ export async function checkSession() {
       }
     }
 
-    return apiRes; // <-- повний Axios response, без обгортки NextResponse
+    return apiRes; // завжди повний AxiosResponse
   } catch (error) {
     if (isAxiosError(error)) {
       logErrorResponse(error.response?.data);
+      if (error.response) {
+        return error.response; // теж повний AxiosResponse, просто з кодом помилки (401 і т.д.)
+      }
     } else {
       logErrorResponse({ message: (error as Error).message });
     }
-    throw error; // або: return error.response, якщо хочете обробляти без throw
+    throw error; // немає навіть response (мережева помилка) — прокидаємо далі
   }
 }

@@ -22,7 +22,7 @@ export default function AuthNavigation() {
       });
   }, [isAuth]);
 
-  async function hanldeLogout() {
+  async function handleLogout () {
     try {
       await logout();
       removeUser();
@@ -48,7 +48,7 @@ export default function AuthNavigation() {
           </li>
           <li className={css.navigationItem}>
             <p className={css.userEmail}>{user?.email}</p>
-            <button className={css.logoutButton} onClick={hanldeLogout}>
+            <button className={css.logoutButton} onClick={handleLogout}>
               Logout
             </button>
           </li>
