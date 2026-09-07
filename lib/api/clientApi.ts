@@ -69,6 +69,7 @@ export async function login(user : RegisterRequest){
 
 export async function logout(){
  await api.post('/auth/logout');
+ return;
 }
 
 
@@ -82,7 +83,7 @@ export async function getMe(){
   return response.data;
 }
 
-export async function updateMe(user : string){
+export async function updateMe(user : {username : string}){
   const response = await api.patch<User>("/users/me", user);
   return response.data;
 }
