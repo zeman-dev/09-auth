@@ -35,6 +35,7 @@ export default function EditProfilePage() {
       setChangedUser(updatedUser);
       try {
         await updateMe({username : changedUsername});
+        router.push('/profile');
       } catch (error) {
         console.log(error);
       }
